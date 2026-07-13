@@ -26,7 +26,7 @@ def decodef(bs64bytes):
     decoded_text = rslt.decode('utf-8')
     
 
-version = "v2.5.0-release"
+version = "v2.5.5-release"
 
 timen = None
 
@@ -53,19 +53,6 @@ def connect_client(ipf, portf):
 def clear():
     os.system("cls")
 
-
-
-
-clear()
-
-get_time()
-print(f"Welcome to MMger(Messenger Manager) {version}")
-
-print("1. Connect \n2. Create server\n")
-
-cmd = input(f"MESSENGER-MANAGER> ")
-
-
 try:
     with open("config.json", "r", encoding="utf-8") as f:
         config = json.load(f)
@@ -88,6 +75,20 @@ except Exception as e:
     print('configs: {\n    "upload_config": true,\n    "ip": "localhost",\n    "port": 25565,\n    "password": 1234\n}')
     input("Click enter to leave...")
     exit()
+
+
+clear()
+
+get_time()
+print(f"Welcome to MMger(Messenger Manager) {version}")
+
+print("1. Connect \n2. Create server\n3. More info about programm and creator")
+
+cmd = input(f"MESSENGER-MANAGER> ")
+
+
+
+
 
 
 
@@ -320,6 +321,24 @@ elif cmd == "2":
         print(f"{address}: {decoded_text} [{timen}]")
     server.close()
     client.close()
+    
+    
+elif cmd == "3":
+    clear()
+    print("Creator name on GitHub: NullX (nullx26)")
+    print("Original github MMger page: https://github.com/nullx26/MMger")
+    print("Using NSL license")
+    print("Link on NSL license: https://github.com/nullx26/MMger/blob/main/LICENSE")
+    input("Click enter to leave...")
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
 else:
