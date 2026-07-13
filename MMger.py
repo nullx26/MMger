@@ -25,7 +25,7 @@ def decodef(bs64bytes):
     decoded_text = rslt.decode('utf-8')
     
 
-version = "v1.0.0-release"
+version = "v1.0.1-release"
 
 timen = None
 
@@ -130,17 +130,18 @@ if cmd == "1":
 
     while connection:
         
-        get_time()
         print(f"The {ip}:{port} is typing...\n\n")
         msg = client.recv(1024)
         decodef(msg)
         if decoded_text == "server.chat.clear":
             clear()
+        get_time()
         print(f"\n{ip}:{port}> {decoded_text} [{timen}]\n")
 
 
         sendorc = input("> ")
         encodef(sendorc)
+        get_time()
         print(f"(SENDING...) CLIENT: {sendorc} [{timen}]\n")
         client.send(encoded_text)
         print(f"\r(SENDED) CLIENT: {sendorc} [{timen}]")
@@ -236,14 +237,14 @@ elif cmd == "2":
 
 
     while server_c:
-        get_time()
         sendors = input("> ")
         if sendors == "server.chat.clear":
             clear()
         if sendors == "server.disconnect":
-            server.close
-            client.close
+            server.close()
+            client.close()
             server_c = False
+        get_time()
         print(f"(SENDING...) {ips}:{ports}> {sendors} [{timen}]\n")
         encodef(sendors)
         try:
@@ -255,9 +256,10 @@ elif cmd == "2":
         print(f"(SENDED) {ips}:{ports}> {sendors} [{timen}]")
         msg = client.recv(1024)
         decodef(msg)
+        get_time()
         print(f"{address}: {decoded_text} [{timen}]")
-    server.close
-    client.close
+    server.close()
+    client.close()
 
 
 else:
