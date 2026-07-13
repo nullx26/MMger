@@ -8,6 +8,7 @@
 
 import socket, os, time, sys
 import base64
+import json
 
 
 encoded_text = None
@@ -25,7 +26,7 @@ def decodef(bs64bytes):
     decoded_text = rslt.decode('utf-8')
     
 
-version = "v1.0.1-release"
+version = "v2.5.0-release"
 
 timen = None
 
@@ -44,7 +45,7 @@ def connect_client(ipf, portf):
         client.connect((ipf, portf))
     except Exception as e:
         print("Error while connecting! Retrying...")
-        connect_client(ipf, port)
+        connect_client(ipf, portf)
 
 
 
@@ -65,6 +66,28 @@ print("1. Connect \n2. Create server\n")
 cmd = input(f"MESSENGER-MANAGER> ")
 
 
+try:
+    with open("config.json", "r", encoding="utf-8") as f:
+        config = json.load(f)
+except FileNotFoundError:
+    print("config.json was not found or was deleted, please recover it")
+    print("config file example: ")
+    print("name: config.json")
+    print('configs: {\n    "upload_config": true,\n    "ip": "localhost",\n    "port": 25565,\n    "password": 1234\n}')
+    input("Click enter to leave...")
+    exit()
+try:
+    config_turned_on = config["upload_config"]
+    imported_ip = config["ip"]
+    imported_port = config["port"]
+    imported_pass = config["password"]
+except Exception as e:
+    print("config.json was erassed or one of configurations was not found(or changed), please check and recover it")
+    print("config file example: ")
+    print("name: config.json")
+    print('configs: {\n    "upload_config": true,\n    "ip": "localhost",\n    "port": 25565,\n    "password": 1234\n}')
+    input("Click enter to leave...")
+    exit()
 
 
 
@@ -87,15 +110,22 @@ if cmd == "1":
 
     clear()
     port = None
-    print("Please, enter IP and port")
-    ip = input("IP> ")
-    clear()
-    if ip == "localhost":
-        port = 25565
+    if config_turned_on == True:
+        print("")
+        ip = imported_ip
+        port = imported_port
+        connect_client(ip, port)
+        does_have_pswd = client.recv(1024).decode('utf-8')
     else:
-        port = int(input("PORT> "))
-    connect_client(ip, port)
-    does_have_pswd = client.recv(1024).decode('utf-8')
+        print("Please, enter IP and port")
+        ip = input("IP> ")
+        clear()
+        if ip == "localhost":
+            port = 25565
+        else:
+            port = int(input("PORT> "))
+            connect_client(ip, port)
+            does_have_pswd = client.recv(1024).decode('utf-8')
     
     
     
@@ -103,17 +133,34 @@ if cmd == "1":
     attempts = 3
     def pasw():
         global attempts
-        password_c = input("PASSWORD> ")
-        client.send(password_c.encode('utf-8'))
-        crslt = client.recv(1024).decode('utf-8')
-        if crslt == "wrg":
-            pasw()
-            attempts -= 1
-            if attempts == 0:
-                client.close()
-                exit()
-        elif crslt == "scs":
-            print("success!")
+        if config_turned_on == True:
+            password_c = imported_pass
+            client.send(password_c.encode('utf-8'))
+            crslt = client.recv(1024).decode('utf-8')
+            if crslt == "wrg":
+                pasw()
+                attempts -= 3
+                if attempts == 0:
+                    client.close()
+                    print("Wrong password!")
+                    input("Click enter to leave...")
+                    exit()
+                elif crslt == "scs":
+                    print("Correct password")
+        else:
+            password_c = input("PASSWORD> ")
+            client.send(password_c.encode('utf-8'))
+            crslt = client.recv(1024).decode('utf-8')
+            if crslt == "wrg":
+                attempts -= 1
+                pasw()
+                if attempts == 0:
+                    client.close()
+                    print("Wrong password! No attempts!")
+                    input("Click enter to leave...")
+                    exit()
+                elif crslt == "scs":
+                    print("Correct password!")
 
 
 
@@ -167,19 +214,29 @@ if cmd == "1":
 
 elif cmd == "2":
     server = socket.socket()
-    ports = None
-    print("Please, enter IP and port")
-    ips = input("IP> ")
-    if ips == "localhost":
-        
-        ports = 25565
-        
+    print("Importing from config...")
+    if config_turned_on == True:
+        ips = imported_ip
+        ports = imported_port
+            
+            
+        password = imported_pass
     else:
-        
-        ports = int(input("PORT> "))
-        
-        
-    password = input("PASSWORD(just click enter you want without password)> ")
+            
+            
+        ports = None
+        print("Please, enter IP and port")
+        ips = input("IP> ")
+        if ips == "localhost":
+                
+            ports = 25565
+                
+        else:
+                
+            ports = int(input("PORT> "))
+            
+            
+        password = input("PASSWORD(just click enter you want without password)> ")
     clear()
 
 
@@ -192,6 +249,9 @@ elif cmd == "2":
         text = f"Connected! IP: {address}"
         
         if password == " ":
+            
+            password = None
+        if password == "":
             
             password = None
             
