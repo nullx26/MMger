@@ -1,1 +1,1 @@
-That's alpha programm, it's have a lot of bugs
+I'm bad at programming, so it can work buggy or bad
